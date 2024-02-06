@@ -5,8 +5,10 @@ import sys
 current_dir = os.path.dirname(os.path.realpath(__file__))
 parent_dir = os.path.dirname(current_dir)
 data_dir = os.path.join(os.path.dirname(parent_dir), 'data')
+web_dir = os.path.join(os.path.dirname(parent_dir), 'rateradar/web/public')
 raw_dir = os.path.join(data_dir, 'raw')
 processed_dir = os.path.join(data_dir, 'processed')
 
 RAW_DIR = raw_dir
 PROCESSED_DIR = processed_dir
+WEB_DIR = web_dir

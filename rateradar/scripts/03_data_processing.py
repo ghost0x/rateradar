@@ -40,13 +40,13 @@ def interpolate_gdp(gdp_data: pd.DataFrame) -> pd.DataFrame:
     Interpolates GDP data from quarterly to monthly frequency.
 
     Args:
-        gdp_data (pd.DataFrame): A DataFrame containing GDP data with a 'Date' column.
+        gdp_data (pd.DataFrame): A DataFrame containing GDP data with a 'date' column.
 
     Returns:
         pd.DataFrame: The input DataFrame resampled to monthly frequency, with missing values interpolated.
     """
-    gdp_data['Date'] = pd.to_datetime(gdp_data['Date'])
-    gdp_data.set_index('Date', inplace=True)
+    gdp_data['date'] = pd.to_datetime(gdp_data['date'])
+    gdp_data.set_index('date', inplace=True)
     
     monthly_df = gdp_data.resample('M').first()
     new_index = monthly_df.index.map(lambda d: pd.Timestamp(year=d.year, month=d.month, day=1))
@@ -56,19 +56,19 @@ def interpolate_gdp(gdp_data: pd.DataFrame) -> pd.DataFrame:
 
 def load_and_process_data(filename: str, date_parser=None) -> pd.DataFrame:
     """
-    Loads a CSV file into a DataFrame and processes the 'Date' column.
+    Loads a CSV file into a DataFrame and processes the 'date' column.
 
     Args:
         filename (str): The path to the CSV file to load.
-        date_parser (function, optional): A function to apply to the 'Date' column. Defaults to None.
+        date_parser (function, optional): A function to apply to the 'date' column. Defaults to None.
 
     Returns:
         pd.DataFrame: The loaded and processed DataFrame.
     """
     df = pd.read_csv(filename)
     if date_parser:
-        df['Date'] = df['Date'].apply(date_parser)
-    df['Date'] = pd.to_datetime(df['Date'])
+        df['date'] = df['date'].apply(date_parser)
+    df['date'] = pd.to_datetime(df['date'])
     return df
 
 def add_suffix(df, suffix, on):
@@ -141,13 +141,13 @@ def main():
         df_to_merge.append(load_and_process_data(index_filename))
         suffixes.append('_' + filepath.split('_')[0])
 
-    merged_df = merge_dataframes(df_to_merge, on='Date', suffixes=tuple(suffixes))
+    merged_df = merge_dataframes(df_to_merge, on='date', suffixes=tuple(suffixes))
 
     #merged_df = remove_na_rows(merged_df)
 
-    # Only rows after 'Date' is 7/1/1957 which is when GDP starts coming in
-    merged_df = merged_df[merged_df['Date'] >= '1957-07-01']
-
+    # Only rows after 'date' is 7/1/1957 which is when GDP starts coming in
+    merged_df = merged_df[merged_df['date'] >= '1957-07-01']
+    merged_df = merged_df.set_index('date')
     merged_df.to_csv(os.path.join(paths.PROCESSED_DIR, 'merged.csv'))
 
 if __name__ == "__main__":

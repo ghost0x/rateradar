@@ -1,0 +1,118 @@
+<html>
+    <head>
+        <title>Rate Radar</title>
+        <script src="https://code.highcharts.com/stock/highstock.js"></script>
+        <script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
+    </head>
+    <body>
+        <div id="container"></div>
+
+        <a href="output.json">Download Data</a>
+
+        <script>
+            (async () => {
+               
+                const jsonData = await fetch(
+                    'output.json'
+                ).then(response => response.json());
+
+                const dates = jsonData.map(item => item.date);
+                const cpi6m = jsonData.map(item => item["6m_pct_change_pcpi"]);
+                const cpi6mx = jsonData.map(item => item["6m_pct_change_pcpix"]);
+                const unemploymentRate = jsonData.map(item => item["pct_unemploymentrate"]);
+                const fedFundsRate = jsonData.map(item => item["close_fedfunds"]);
+                const gdpChange = jsonData.map(item => item["gdp_gdp"]);
+                const spx = jsonData.map(item => item["close_spx"]);
+                const dji = jsonData.map(item => item["close_dji"]);
+                const ndx = jsonData.map(item => item["close_ndx"]);
+
+                let chart = Highcharts.chart('container', {
+                    chart: {
+                        zoomType: 'xy' // Enable zooming along both x-axis and y-axis
+                    },title: {
+                        text: 'Monthly Economic Data'
+                    },
+                    xAxis: {
+                        categories: dates,
+                        title: {
+                            text: 'date'
+                        }
+                    },
+                    yAxis: [{ // Primary y-axis
+                        title: {
+                            text: 'CPI 6M %',
+                        },
+                        labels: {
+                            format: '{value}',
+                        },
+                    }, { 
+                        title: {
+                            text: 'Unemployment Rate',
+                        },
+                        labels: {
+                            format: '{value}%',
+                        },
+                        opposite: true
+                    }, { 
+                        title: {
+                            text: 'Fed Funds Rate',
+                        },
+                        labels: {
+                            format: '{value}%',
+                        },
+                        opposite: true
+                    }, { // 
+                        title: {
+                            text: 'GDP % Change',
+                        },
+                        labels: {
+                            format: '{value}%',
+                        },
+                        opposite: true
+                    }, { // 
+                        title: {
+                            text: 'SPX',
+                        },
+                        labels: {
+                            format: '{value}',
+                        },
+                        opposite: true
+                    }, { // 
+                        title: {
+                            text: 'NDX',
+                        },
+                        labels: {
+                            format: '{value}',
+                        },
+                        opposite: true
+                    },],
+                    series: [{
+                        name: 'CPI 6M % Change',
+                        yAxis: 0, // Use the primary y-axis for this series
+                        data: cpi6m
+                    }, {
+                        name: 'Unemployment Rate',
+                        yAxis: 1, 
+                        data: unemploymentRate
+                    }, {
+                        name: 'Fed Funds Rate',
+                        yAxis: 2, 
+                        data: fedFundsRate
+                    }, {
+                        name: 'GDP % Change',
+                        yAxis: 3, 
+                        data: gdpChange
+                    }, {
+                        name: 'SPX',
+                        yAxis: 4, 
+                        data: spx
+                    }, {
+                        name: 'NDX',
+                        yAxis: 5, 
+                        data: ndx
+                    }]
+                });
+            })();
+        </script>
+    </body>
+</html>

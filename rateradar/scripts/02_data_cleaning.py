@@ -50,22 +50,22 @@ def clean_cpi(input_file: str, output_file: str) -> None:
     df = read_excel_file(input_file)
     last_col = df.columns[-1]
     clean_df = df[['DATE', last_col]]
-    clean_df = clean_df.rename(columns={'DATE': 'Date', last_col: 'Raw'})
-    clean_df['Date'] = clean_df['Date'].str.split(':', expand=True)[1] + '/01/' + clean_df['Date'].str.split(':', expand=True)[0]
-    clean_df = clean_df.set_index('Date')
-    clean_df['Pct'] = clean_df['Raw'].pct_change()
+    clean_df = clean_df.rename(columns={'DATE': 'date', last_col: 'raw'})
+    clean_df['date'] = clean_df['date'].str.split(':', expand=True)[1] + '/01/' + clean_df['date'].str.split(':', expand=True)[0]
+    clean_df = clean_df.set_index('date')
+    clean_df['pct'] = clean_df['raw'].pct_change() * 100
 
     # Get the CPI difference between this row and 6 rows ago
-    clean_df['6m_change'] = clean_df['Raw'].diff(6)
+    clean_df['6m_change'] = clean_df['raw'].diff(6)
 
     # Calculate what percentage change that is
-    clean_df['6m_pct_change'] = clean_df['6m_change'] / clean_df['Raw'].shift(6)
+    clean_df['6m_pct_change'] = clean_df['6m_change'] / clean_df['raw'].shift(6) * 100
 
     # Double the change to get the annualized rate
     clean_df['annualized_change'] = clean_df['6m_pct_change'] * 2
 
-    # Drop the raw change
-    clean_df = clean_df.drop(columns=['6m_change'])
+    # Drop unnecessary columns
+    clean_df = clean_df[['pct', '6m_pct_change', 'annualized_change']]
 
     save_to_csv(clean_df, output_file)
 
@@ -79,8 +79,14 @@ def clean_gdp(input_file: str, output_file: str) -> None:
     """
     df = pd.read_excel(input_file, sheet_name=1, skiprows=4)
     clean_df = df[['Date', 'First']]
-    clean_df = clean_df.set_index('Date')
-    clean_df = clean_df.rename(columns={'First': 'GDP'})
+    clean_df = clean_df.rename(columns={'Date': 'date'})
+    clean_df = clean_df.rename(columns={'First': 'gdp'})
+    clean_df = clean_df.set_index('date')
+    convert_to_numeric(clean_df, 'gdp')
+    
+    # Drop unnecessary columns
+    clean_df = clean_df[['gdp']]
+
     save_to_csv(clean_df, output_file)
 
 def clean_employment(input_file: str, output_file: str) -> None:
@@ -94,10 +100,23 @@ def clean_employment(input_file: str, output_file: str) -> None:
     df = read_excel_file(input_file)
     last_col = df.columns[-1]
     clean_df = df[['DATE', last_col]]
-    clean_df = clean_df.rename(columns={'DATE': 'Date', last_col: 'Raw'})
-    clean_df['Date'] = clean_df['Date'].str.split(':', expand=True)[1] + '/01/' + clean_df['Date'].str.split(':', expand=True)[0]
-    clean_df = clean_df.set_index('Date')
+    convert_to_numeric(clean_df, last_col)
+    clean_df = clean_df.rename(columns={'DATE': 'date', last_col: 'pct'})
+    clean_df['date'] = clean_df['date'].str.split(':', expand=True)[1] + '/01/' + clean_df['date'].str.split(':', expand=True)[0]
+    clean_df = clean_df.set_index('date')
+    clean_df = clean_df[['pct']]
     save_to_csv(clean_df, output_file)
+
+def convert_to_numeric(df: pd.DataFrame, column: str) -> None:
+    """
+    Convert the column in the DataFrame to a numeric value.
+
+    Args:
+    df (pd.DataFrame): The DataFrame to convert.
+    column (str): The column to convert to a numeric value.
+    """
+    df.loc[:, column] = pd.to_numeric(df[column], errors='coerce')
+    
 
 def clean_tradingview(input_file: str, output_file: str) -> None:
     """
@@ -108,14 +127,15 @@ def clean_tradingview(input_file: str, output_file: str) -> None:
     output_file (str): The output file to save the cleaned data to.
     """
     clean_df = pd.read_csv(input_file)
-    clean_df['Date'] = pd.to_datetime(clean_df['time'], unit='s')
+    clean_df['date'] = pd.to_datetime(clean_df['time'], unit='s')
     
     # Set the day to 1 for each row so it aligns with the other data
-    clean_df['Date'] = clean_df['Date'].apply(lambda x: x.replace(day=1))
+    clean_df['date'] = clean_df['date'].apply(lambda x: x.replace(day=1))
 
-    clean_df['Date'] = clean_df['Date'].dt.strftime('%Y-%m-%d')
-    clean_df = clean_df[['Date', 'close']]
-    clean_df = clean_df.set_index('Date')
+    clean_df['date'] = clean_df['date'].dt.strftime('%Y-%m-%d')
+    clean_df = clean_df[['date', 'close']]
+    convert_to_numeric(clean_df, 'close')
+    clean_df = clean_df.set_index('date')
     save_to_csv(clean_df, output_file)
 
 def main():
