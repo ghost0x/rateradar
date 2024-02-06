@@ -41,7 +41,7 @@ To carry out this project, you would need access to historical economic data and
 poetry run python -m rateradar.scripts.02_data_cleaning
 ```
 
-## Data Series
+## Data Series References
 
 https://www.philadelphiafed.org/surveys-and-data/real-time-data-research/real-time-data-set-full-time-series-history
 
@@ -50,6 +50,14 @@ https://www.philadelphiafed.org/surveys-and-data/real-time-data-research/real-ti
 | Consumer Price Index (%)     | inflation/pcpi_first_second_third.xlsx  | https://www.philadelphiafed.org/surveys-and-data/real-time-data-research/pcpi  | |
 | Core Consumer Price Index (%) | inflation/pcpix_first_second_third.xlsx | https://www.philadelphiafed.org/surveys-and-data/real-time-data-research/pcpix | |
 | Consumer Price Index (Raw)  | inflation/pcpiMvMd.xlsx | https://www.philadelphiafed.org/-/media/frbp/assets/surveys-and-data/real-time-data/data-files/xlsx/pcpimvmd.xlsx?la=en&hash=652DCE5337C1BFD5BB297577157F5E0D | |
+| GDP Output | gdp/routput_first_second_third.xlsx | https://www.philadelphiafed.org/-/media/frbp/assets/surveys-and-data/real-time-data/data-files/xlsx/routput_first_second_third.xlsx?la=en&hash=7B8E18E3DC34170B2D4F684F7EBBE631 | |
+| Unemployment Rate | employment/rucQvMd.xlsx | https://www.philadelphiafed.org/-/media/frbp/assets/surveys-and-data/real-time-data/data-files/xlsx/routputmvqd.xlsx?la=en&hash=403C8B9FD72B33F83C1EE5C59D015C86 | |
+| Fed Runds Rate | rates/fedfunds_1m.csv | TradingView | |
+| SPX | indices/spx_1m.csv | TradingView | |
+| NDX | indices/ndx_1m.csv | TradingView | |
+| DJI | indices/dji_1m.csv | TradingView | |
+| RTY | indices/rty_1m.csv | TradingView | |
+
 
 ### Notes on Inflation Data Series
 
